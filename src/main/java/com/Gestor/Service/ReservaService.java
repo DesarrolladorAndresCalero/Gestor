@@ -12,4 +12,6 @@ public interface ReservaService {
     List<Reserva> listarReservasPorUsuario(Long usuarioId);
     List<Reserva> listarReservasPorServicio(Long servicioId);
     void cancelarReserva(Long id);
+    Reserva guardarReserva(Reserva reserva);
+    List<Reserva> listarReservasPorCliente(Long clienteId);
 }

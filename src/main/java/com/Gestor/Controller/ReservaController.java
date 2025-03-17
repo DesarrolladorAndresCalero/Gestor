@@ -24,10 +24,16 @@ public class ReservaController {
 
     // Crear una nueva reserva
     @PostMapping("/crear")
-    public ResponseEntity<Reserva> crearReserva(@RequestBody Reserva reserva) {
-        Reserva nuevaReserva = reservaService.crearReserva(reserva);
+    public ResponseEntity<?> crearReserva(@RequestBody Reserva reserva) {
+        if (reserva.getCliente() == null) {
+            return ResponseEntity.badRequest().body("El cliente no puede ser nulo");
+        }
+
+        Reserva nuevaReserva = reservaService.guardarReserva(reserva);
         return ResponseEntity.ok(nuevaReserva);
     }
+
+
 
     // Obtener una reserva por ID
     @GetMapping("/{id}")
@@ -63,6 +69,12 @@ public class ReservaController {
         Map<String, String> response = new HashMap<>();
         response.put("mensaje", "La reserva ha sido cancelada exitosamente.");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<Reserva>> obtenerReservasPorCliente(@PathVariable Long clienteId) {
+        List<Reserva> reservas = reservaService.listarReservasPorCliente(clienteId);
+        return ResponseEntity.ok(reservas);
     }
 
 }

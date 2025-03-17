@@ -30,9 +30,12 @@ public class Usuario {
     private TipoUsuario tipoUsuario;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "usuario")
-    private List<Reserva> reservas;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservasComoUsuario;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservasComoCliente;
     // Constructor vacío
     public Usuario() {
     }
@@ -44,7 +47,8 @@ public class Usuario {
         this.email = email;
         this.contrasena = contrasena;
         this.tipoUsuario = tipoUsuario;
-        this.reservas = reservas;
+        this.reservasComoUsuario = reservasComoUsuario;
+        this.reservasComoCliente = reservasComoCliente;
     }
 
     // Getters y Setters
@@ -88,12 +92,20 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
 
-    public List<Reserva> getReservas() {
-        return reservas;
+    public List<Reserva> getReservasComoUsuario() {
+        return reservasComoUsuario;
     }
 
-    public void setReservas(List<Reserva> reservas) {
-        this.reservas = reservas;
+    public void setReservasComoUsuario(List<Reserva> reservasComoUsuario) {
+        this.reservasComoUsuario = reservasComoUsuario;
+    }
+
+    public List<Reserva> getReservasComoCliente() {
+        return reservasComoCliente;
+    }
+
+    public void setReservasComoCliente(List<Reserva> reservasComoCliente) {
+        this.reservasComoCliente = reservasComoCliente;
     }
 
     public enum TipoUsuario {

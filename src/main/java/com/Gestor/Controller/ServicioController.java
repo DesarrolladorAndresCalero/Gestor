@@ -1,7 +1,10 @@
 package com.Gestor.Controller;
 
 import com.Gestor.Model.Servicio;
+import com.Gestor.Model.Usuario;
+import com.Gestor.Repository.UsuarioRepository;
 import com.Gestor.Service.ServicioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,16 +16,21 @@ import java.util.Optional;
 @RequestMapping("/api/servicios")
 public class ServicioController {
     private final ServicioService servicioService;
+    private final UsuarioRepository usuarioRepository;
 
-    public ServicioController(ServicioService servicioService) {
+    public ServicioController(ServicioService servicioService, UsuarioRepository usuarioRepository) {
         this.servicioService = servicioService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @PostMapping("/crear")
-    public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio) {
-        Servicio nuevoServicio = servicioService.crearServicio(servicio);
-        return ResponseEntity.ok(nuevoServicio);
+    public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio, @RequestParam Long adminId) {
+        Servicio nuevoServicio = servicioService.crearServicio(servicio, adminId);
+        return new ResponseEntity<>(nuevoServicio, HttpStatus.CREATED);
     }
+
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Servicio> obtenerServicioPorId(@PathVariable Long id) {

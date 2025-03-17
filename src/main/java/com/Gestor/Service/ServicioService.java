@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ServicioService {
-    Servicio crearServicio(Servicio servicio);
+    Servicio crearServicio(Servicio servicio, Long adminId);
     Optional<Servicio> obtenerServicioPorId(Long id);
     List<Servicio> listarServicios();
     void eliminarServicio(Long id);

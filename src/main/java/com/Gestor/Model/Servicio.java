@@ -14,40 +14,38 @@ public class Servicio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonProperty("nombre")
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @JsonProperty("descripcion")
     @Column(name = "descripcion", nullable = false, length = 255)
     private String descripcion;
 
-    @JsonProperty("duracion")
     @Column(name = "duracion", nullable = false)
     private int duracion;
 
-    @JsonProperty("precio")
     @Column(name = "precio", nullable = false)
     private double precio;
 
-    @JsonProperty("horaInicio")
     @Column(name = "hora_inicio", nullable = false)
     private LocalTime horaInicio;
 
-    @JsonProperty("horaFin")
     @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
 
-    @JsonIgnore // Evita la serialización de la relación inversa
+    @JsonIgnore
     @OneToMany(mappedBy = "servicio")
     private List<Reserva> reservas;
 
-    // Constructor vacío
+    // 🔥 Nueva relación: quién creó el servicio
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = true)
+    private Usuario administrador;
+
     public Servicio() {
     }
 
-    // Constructor con parámetros
-    public Servicio(Long id, String nombre, String descripcion, int duracion, double precio, LocalTime horaInicio, LocalTime horaFin, List<Reserva> reservas) {
+    public Servicio(Long id, String nombre, String descripcion, int duracion, double precio,
+                    LocalTime horaInicio, LocalTime horaFin, List<Reserva> reservas, Usuario administrador) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -56,6 +54,15 @@ public class Servicio {
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
         this.reservas = reservas;
+        this.administrador = administrador;
+    }
+
+    public Usuario getAdministrador() {
+        return administrador;
+    }
+
+    public void setAdministrador(Usuario administrador) {
+        this.administrador = administrador;
     }
 
     // Getters y Setters

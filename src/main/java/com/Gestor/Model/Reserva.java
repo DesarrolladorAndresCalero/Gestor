@@ -15,9 +15,15 @@ public class Reserva {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
     @JsonProperty("usuario")
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", referencedColumnName = "id", nullable = false)
+    @JsonProperty("cliente")
+    private Usuario cliente;
+
 
     @ManyToOne
     @JoinColumn(name = "servicio_id", nullable = false)
@@ -25,8 +31,7 @@ public class Reserva {
     private Servicio servicio;
 
     @Column(name = "fecha_reserva", nullable = false)
-    @JsonProperty("fechaReserva")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS", timezone = "UTC")
     private LocalDateTime fechaReserva;
 
     @Enumerated(EnumType.STRING)
@@ -68,6 +73,14 @@ public class Reserva {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public Usuario getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Usuario cliente) {
+        this.cliente = cliente;
     }
 
     public Servicio getServicio() {

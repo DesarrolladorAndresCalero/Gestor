@@ -53,4 +53,11 @@ public class UsuarioController {
         }
         return null; // Retornar null si el usuario no existe o la contraseña es incorrecta
     }
+
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        usuarioService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

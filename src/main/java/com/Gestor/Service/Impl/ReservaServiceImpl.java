@@ -32,21 +32,41 @@ public class ReservaServiceImpl implements ReservaService {
     @Override
     @Transactional
     public Reserva crearReserva(Reserva reserva) {
-        Usuario usuario = usuarioRepository.findById(reserva.getUsuario().getId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        try {
+            if (reserva.getUsuario() == null || reserva.getUsuario().getId() == null) {
+                throw new RuntimeException("El usuario de la reserva es nulo o no tiene ID");
+            }
 
-        Servicio servicio = servicioRepository.findById(reserva.getServicio().getId())
-                .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+            if (reserva.getServicio() == null || reserva.getServicio().getId() == null) {
+                throw new RuntimeException("El servicio de la reserva es nulo o no tiene ID");
+            }
 
-        reserva.setUsuario(usuario);
-        reserva.setServicio(servicio);
-        Reserva nuevaReserva = reservaRepository.save(reserva);
+            if (reserva.getFechaReserva() == null) {
+                throw new RuntimeException("La fecha de la reserva es nula");
+            }
 
-        // ✅ Registrar en el historial
-        historialReservaService.registrarAccion(nuevaReserva, "CREADA");
+            Usuario usuario = usuarioRepository.findById(reserva.getUsuario().getId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + reserva.getUsuario().getId()));
 
-        return nuevaReserva;
+            Servicio servicio = servicioRepository.findById(reserva.getServicio().getId())
+                    .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " + reserva.getServicio().getId()));
+
+            reserva.setUsuario(usuario);
+            reserva.setServicio(servicio);
+            Reserva nuevaReserva = reservaRepository.save(reserva);
+
+            // ✅ Registrar en el historial
+            historialReservaService.registrarAccion(nuevaReserva, "CREADA");
+
+            return nuevaReserva;
+
+        } catch (Exception e) {
+            System.err.println("Error al crear la reserva: " + e.getMessage());
+            e.printStackTrace(); // 🔥 Esto imprimirá el error completo en la consola
+            throw e;
+        }
     }
+
 
     @Override
     public Optional<Reserva> obtenerReservaPorId(Long id) {
@@ -84,5 +104,49 @@ public class ReservaServiceImpl implements ReservaService {
         historialReservaService.registrarAccion(reserva, "CANCELADA");
     }
 
+
+    @Override
+    @Transactional
+    public Reserva guardarReserva(Reserva reserva) {
+        if (reserva.getServicio() == null || reserva.getServicio().getId() == null) {
+            throw new RuntimeException("El servicio de la reserva es nulo o no tiene ID");
+        }
+
+        if (reserva.getCliente() == null || reserva.getCliente().getId() == null) {
+            throw new RuntimeException("El cliente de la reserva es nulo o no tiene ID");
+        }
+
+        // 1️⃣ Buscar el servicio y su administrador
+        Servicio servicio = servicioRepository.findById(reserva.getServicio().getId())
+                .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " + reserva.getServicio().getId()));
+
+        Usuario administrador = servicio.getAdministrador();
+        if (administrador == null) {
+            throw new RuntimeException("El servicio no tiene un administrador asignado");
+        }
+
+        // 2️⃣ Buscar el cliente en la base de datos
+        Usuario cliente = usuarioRepository.findById(reserva.getCliente().getId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + reserva.getCliente().getId()));
+
+        // 3️⃣ Asignar correctamente los valores a la reserva
+        reserva.setUsuario(administrador); // ✅ Asigna el ADMINISTRADOR del servicio como usuario de la reserva
+        reserva.setCliente(cliente); // ✅ Asigna el CLIENTE que hizo la reserva
+
+        // 4️⃣ Guardar la reserva con los valores correctos
+        Reserva nuevaReserva = reservaRepository.save(reserva);
+
+        // ✅ Registrar en el historial
+        historialReservaService.registrarAccion(nuevaReserva, "CREADA");
+
+        return nuevaReserva;
+    }
+
+    @Override
+    public List<Reserva> listarReservasPorCliente(Long clienteId) {
+        List<Reserva> reservas = reservaRepository.findByClienteId(clienteId);
+        System.out.println("✅ Reservas encontradas para el cliente " + clienteId + ": " + reservas.size());
+        return reservas;
+    }
 
 }
