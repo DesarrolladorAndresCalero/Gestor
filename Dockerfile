@@ -1,29 +1,25 @@
-# Usa una imagen base con Java 21 y Maven para la compilación
-FROM eclipse-temurin:21-jdk AS build
+# Etapa de construcción
+FROM amazoncorretto:21 AS build
 
-# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
-
-# Copia los archivos del proyecto al contenedor
 COPY . .
 
-# Da permisos de ejecución al Maven Wrapper
+# Otorga permisos de ejecución a Maven Wrapper
 RUN chmod +x mvnw
 
 # Construye el proyecto sin ejecutar pruebas
 RUN ./mvnw -B -DskipTests clean package
 
-# Usa una imagen más ligera para ejecutar el JAR
-FROM eclipse-temurin:21-jre AS runtime
+# Etapa de ejecución con una imagen más ligera
+FROM amazoncorretto:21 AS runtime
 
-# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia el JAR generado desde la fase de construcción
+# Copia el archivo JAR generado en la etapa de construcción
 COPY --from=build /app/target/*.jar app.jar
 
-# Expone el puerto 8080 para que el servicio pueda ser accesible
+# Expone el puerto 8080 para la aplicación
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
+# Comando de inicio de la aplicación
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
