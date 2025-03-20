@@ -2,6 +2,7 @@ package com.Gestor.Controller;
 import com.Gestor.Model.Reserva;
 import com.Gestor.Model.Servicio;
 import com.Gestor.Model.Usuario;
+import com.Gestor.Service.Impl.EmailService;
 import com.Gestor.Service.ReservaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +19,14 @@ public class ReservaController {
 
     private final ReservaService reservaService;
 
-    public ReservaController(ReservaService reservaService) {
+    private final EmailService emailService;
+
+    public ReservaController(ReservaService reservaService, EmailService emailService) {
         this.reservaService = reservaService;
+        this.emailService = emailService;
     }
+
+
 
     // Crear una nueva reserva
     @PostMapping("/crear")
@@ -30,6 +36,7 @@ public class ReservaController {
         }
 
         Reserva nuevaReserva = reservaService.guardarReserva(reserva);
+        emailService.enviarCorreo("xxpawixx@gmail.com", "Cambio de estado", "¡Hola! hubo un cambio en el servicio publicado.");
         return ResponseEntity.ok(nuevaReserva);
     }
 
@@ -68,6 +75,7 @@ public class ReservaController {
         reservaService.cancelarReserva(id);
         Map<String, String> response = new HashMap<>();
         response.put("mensaje", "La reserva ha sido cancelada exitosamente.");
+        emailService.enviarCorreo("xxpawixx@gmail.com", "Cancelacion", "¡Hola! el servicio que publicaste fue cancelado.");
         return ResponseEntity.ok(response);
     }
 
